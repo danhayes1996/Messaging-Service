@@ -1,5 +1,6 @@
 package com.drh.messaging.server;
 
+import static com.drh.messaging.server.utils.MessageFormatter.formatMessage;
 import static java.util.logging.Logger.getLogger;
 
 import com.drh.messaging.server.client.ClientSocket;
@@ -40,7 +41,7 @@ public class Server {
   }
 
   public void broadcastMessage(ClientSocket sender, String message) {
-    byte[] formattedMessage = getFormattedMessage(sender, message);
+    byte[] formattedMessage = formatMessage(getMessageWithSender(sender, message), true);
     for (ClientSocket clientSocket : clientSockets) {
       if (sender.getScreenName().equals(clientSocket.getScreenName())) {
         continue;
@@ -50,26 +51,27 @@ public class Server {
   }
 
   private void broadcastMessage(String message) {
+    byte[] formattedMessage = formatMessage(message, true);
     for (ClientSocket clientSocket : clientSockets) {
-      clientSocket.send(message.getBytes());
+      clientSocket.send(formattedMessage);
     }
   }
 
-  private byte[] getFormattedMessage(ClientSocket sender, String message) {
-    return (sender.getScreenName() + " : " + message + "\n").getBytes();
+  private String getMessageWithSender(ClientSocket sender, String message) {
+    return sender.getScreenName() + " : " + message + "\n";
   }
 
   public void addClientSocket(ClientSocket clientSocket) {
     LOGGER.info("Adding client \"" + clientSocket.getScreenName() + " to list of connections");
     if (clientSockets.add(clientSocket)) {
-      broadcastMessage(clientSocket.getScreenName() + " has connected to the server.\n");
+      broadcastMessage(clientSocket.getScreenName() + " has connected to the server.");
     }
   }
 
   public void removeClient(ClientSocket clientSocket) {
     LOGGER.info("Removing client \"" + clientSocket.getScreenName() + " from list of connections");
     if (clientSockets.remove(clientSocket)) {
-      broadcastMessage(clientSocket.getScreenName() + " has disconnected from the server.\n");
+      broadcastMessage(clientSocket.getScreenName() + " has disconnected from the server.");
     }
   }
 

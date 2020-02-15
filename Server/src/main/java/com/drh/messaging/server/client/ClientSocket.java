@@ -1,5 +1,7 @@
 package com.drh.messaging.server.client;
 
+import static com.drh.messaging.server.utils.MessageFormatter.formatMessage;
+
 import com.drh.messaging.server.Server;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -70,7 +72,7 @@ public class ClientSocket implements Runnable {
     InputStream clientIs = socket.getInputStream();
     BufferedReader reader = new BufferedReader(new InputStreamReader(clientIs));
 
-    clientOs.write("Welcome, enter a screen name: ".getBytes());
+    clientOs.write(formatMessage("Welcome, enter a screen name:", false));
 
     String screenName = reader.readLine();
     this.screenName = screenName;
